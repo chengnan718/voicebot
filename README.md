@@ -1,6 +1,4 @@
-# Project Title
-
-AI voice Chatbot
+# AI voice Chatbot
 
 This project is based on AI voice chatbot with rasa, vosk, SpeechRecognition
 
@@ -8,9 +6,24 @@ This project is based on AI voice chatbot with rasa, vosk, SpeechRecognition
 
 ### Install Dependencies
 
-pip install vosk pyaudio requests
+```bash
+pip install vosk pyaudio requests pyttsx3
+```
 
-### Setup Rasa server
+## Structure of the project
+
+### Speech Recognition
+
+```bash
+import vosk
+
+# Path to the downloaded Vosk model
+model_path = "vosk-model-small-en-us-0.15"  # Change this to your model's path
+
+model = vosk.Model(model_path)
+```
+
+### Rasa Server
 
 - Create a new Rasa Project
 
@@ -45,4 +58,51 @@ actions:
   - utter_affirm
   - utter_deny
 
+```
+
+- Define NLU Data in data/nlu.yml
+
+```bash
+version: "3.0"
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - hey
+    - good morning
+    - good evening
+- intent: goodbye
+  examples: |
+    - goodbye
+    - see you later
+    - bye
+- intent: affirm
+  examples: |
+    - yes
+    - yeah
+    - indeed
+- intent: deny
+  examples: |
+    - no
+    - never
+- intent: ask_weather
+  examples: |
+    - what's the weather like
+    - tell me the weather
+    - how's the weather
+
+```
+
+- Train your Rasa model
+
+```bash
+rasa train
+
+```
+
+- Run the Rasa server- default port is 5005
+
+```bash
+rasa run -m models --enable-api
 ```

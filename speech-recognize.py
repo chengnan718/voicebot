@@ -2,6 +2,8 @@ import os
 import pyaudio
 import vosk
 import json
+import pyttsx3
+import requests
 
 # Path to the downloaded Vosk model
 model_path = "vosk-model-small-en-us-0.15"  # Change this to your model's path
@@ -15,6 +17,27 @@ model = vosk.Model(model_path)
 
 # Set up PyAudio and check if microphone is available
 p = pyaudio.PyAudio()
+
+# Initialize Text-to-Speech engine
+engine = pyttsx3.init()
+
+# Function to send the transcribed text to the Rasa server and get a response
+def send_to_rasa(user_message):
+    try:
+        # Send the user's message to the Rasa server via the REST API
+        response = requests.post(
+            'http://localhost:5005/webhooks/rest/webhook',
+            json={"sender": "user", "message": user_message}
+        )
+        return response.json()  # Return the Rasa response as JSON
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to Rasa: {e}")
+        return None
+
+# Function to convert text to speech
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
 
 try:
     # Check if there's a default input device (microphone)
@@ -38,7 +61,18 @@ try:
         if recognizer.AcceptWaveform(data):
             result = json.loads(recognizer.Result())
             print(f"Recognized: {result['text']}")
+
+            text = result['text']
+            if text:
+                # Send the recognized text to Rasa
+                rasa_response = send_to_rasa(text)
+
+                if rasa_response:
+                    for response in rasa_response:
+                        print(f"Rasa Response: {response['text']}")
+                        speak(response['text'])
         else:
+            # Get partial results if available
             partial_result = json.loads(recognizer.PartialResult())
             print(f"Partial: {partial_result['partial']}")
 
