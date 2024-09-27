@@ -110,3 +110,8 @@ rasa run -m models --enable-api
 ## VOSK model link
 
 https://drive.google.com/drive/folders/1lTqi0J2Fkskw8sPkn-Nq1lLaYAx5XH57
+
+
+## Package URL
+
+https://drive.google.com/drive/folders/1XXBbKZrquSoo9Tut5DVZVxMhUiIaXpvH?usp=drive_link
